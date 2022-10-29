@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MessagesPipe } from '../../pipes/messages/messages.pipe';
 
 @Injectable({
   providedIn: 'root',
@@ -6,7 +7,7 @@ import { Injectable } from '@angular/core';
 export class LoggerService {
   private messages: string[] = [];
 
-  constructor() {}
+  constructor(private msgPipe: MessagesPipe) {}
 
   /**
    * @description To push a msg to the messages array
@@ -15,7 +16,7 @@ export class LoggerService {
    */
   public logMessage(msg: string): void {
     if (msg) {
-      this.messages.push(msg);
+      this.messages.push(this.msgPipe.transformMessage(msg));
     }
   }
 

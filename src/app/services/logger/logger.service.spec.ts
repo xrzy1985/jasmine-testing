@@ -1,14 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 
 import { LoggerService } from './logger.service';
+import { MessagesPipe } from '../../pipes/messages/messages.pipe';
 
 describe('LoggerService', () => {
+  let messagesPipe: MessagesPipe;
   let service: LoggerService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [LoggerService]
+      providers: [LoggerService, MessagesPipe]
     });
+    messagesPipe = TestBed.inject(MessagesPipe);
     service = TestBed.inject(LoggerService);
   });
 

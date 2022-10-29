@@ -2,20 +2,23 @@ import { TestBed } from '@angular/core/testing';
 import { CalculatorService } from '../calculator/calculator.service';
 import { LoggerService } from '../logger/logger.service';
 import { UseServicesService } from './use-services.service';
+import { MessagesPipe } from '../../pipes/messages/messages.pipe';
 
 describe('UseServicesService', () => {
   let calculatorService: CalculatorService;
   let loggerService: LoggerService;
+  let messagePipe: MessagesPipe;
   let service: UseServicesService;
   let spy: any;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CalculatorService, LoggerService, UseServicesService],
+      providers: [CalculatorService, LoggerService, MessagesPipe, UseServicesService],
       imports: [],
     });
     calculatorService = TestBed.inject(CalculatorService);
     loggerService = TestBed.inject(LoggerService);
+    messagePipe = TestBed.inject(MessagesPipe);
     service = TestBed.inject(UseServicesService);
     spy = spyOn(loggerService, 'logMessage');
   });
