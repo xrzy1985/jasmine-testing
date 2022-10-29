@@ -1,11 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'messages'
+  name: 'msgPipe'
 })
 export class MessagesPipe implements PipeTransform {
 
-  transform(): void { void true; }
+  transform(value: string, bool?: boolean): string {
+    return bool ? this.transformMessage(value) : this.transformValue(value);
+  }
 
   public transformValue(value: string): string {
     return !value ? '' : value.charAt(0).toUpperCase() + value.slice(1);

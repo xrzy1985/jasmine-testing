@@ -3,18 +3,20 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { StrengthPipe } from './pipes/strength/strength.pipe';
-import { MessagesPipe } from './pipes/messages/messages.pipe';
+import { MainComponent } from './components/main/main.component';
+import { PipeModule } from './pipes/pipes.module';
+import { NotFoundComponent } from './components/notFound/not-found.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    StrengthPipe,
-    MessagesPipe
+    MainComponent,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    PipeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

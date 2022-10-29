@@ -10,6 +10,15 @@ export class LoggerService {
   constructor(private msgPipe: MessagesPipe) {}
 
   /**
+   * @description To reset the messages array
+   *
+   * @function clearMessages
+   */
+  public clearMessages(): void {
+    this.messages = [];
+  }
+
+  /**
    * @description To push a msg to the messages array
    *
    * @function logMessage

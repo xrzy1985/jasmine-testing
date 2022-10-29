@@ -9,14 +9,28 @@ describe('LoggerService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [LoggerService, MessagesPipe]
+      providers: [LoggerService, MessagesPipe],
     });
     messagesPipe = TestBed.inject(MessagesPipe);
     service = TestBed.inject(LoggerService);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  describe('Logger Service Creation', () => {
+    it('should be created', () => {
+      expect(service).toBeTruthy();
+    });
+
+    it('should not have any messages in the messages array', () => {
+      expect(service['messages'].length).toBeLessThan(1);
+    });
+  });
+
+  describe('clearMessages', () => {
+    it('should clear out the messages array', () => {
+      service.logMessage('A message');
+      service.clearMessages();
+      expect(service.returnMessages().length).toBe(0);
+    });
   });
 
   describe('logMessage', () => {
@@ -40,7 +54,5 @@ describe('LoggerService', () => {
       service.logMessage('This is the only message');
       expect(service.returnMessages().length).toBe(1);
     });
-  })
-  
-  
+  });
 });
