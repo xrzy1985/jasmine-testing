@@ -6,18 +6,23 @@ import {
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { PostsService } from './posts.service';
 import { Posts } from '../../models/posts.interface';
-import { BehaviorSubject, filter, Observable, of, pipe } from 'rxjs';
+import { BehaviorSubject, filter, from, Observable, of, pipe } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CaptureIdPipe } from '../../pipes/captureId/capture-id.pipe';
 
 describe('PostsService', () => {
+  let http: jasmine.SpyObj<HttpClient>;
+  let id: number;
   let mockHttpService: any;
   let mockService: Partial<PostsService>;
   let pipe: CaptureIdPipe;
   let posts: Posts[];
+  let postsService: PostsService;
   let service: PostsService;
 
   beforeEach(() => {
+    http = jasmine.createSpyObj('HttpClient', ['delete', 'get']);
+    id = 1;
     pipe = new CaptureIdPipe();
     posts = [
       {
@@ -39,34 +44,16 @@ describe('PostsService', () => {
         body: 'POST BODY',
       },
     ];
-    mockHttpService = {
-      get: (url: string) => of(posts),
-      delete: (url: string) => {
-        of(posts).subscribe({
-          next: () => {
-            posts = posts.filter((p: Posts) => p.id !== pipe.transform(url));
-          },
-          error: (err: unknown) => {
-            console.error(err);
-          },
-          complete: () => { console.log('Complete Delete'); }
-        });
-      }
-    };
-    mockService = {
-      getPosts: () => mockHttpService.get(environment.urls.posts),
-      deletePost: (id: number) => {
-        mockHttpService.delete(`${environment.urls.posts}${id}`);
-      },
-    };
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        { provide: HttpClient, useValue: mockHttpService },
-        { provide: PostsService, useValue: mockService },
+        PostsService,
+        { provide: HttpClient, useValue: http }
       ],
     });
+    postsService = new PostsService(http);
     service = TestBed.inject(PostsService);
+    http = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
   });
 
   describe('Service Creation', () => {
@@ -75,30 +62,65 @@ describe('PostsService', () => {
     });
   });
 
-  describe('getPosts', () => {
-    it('should return the posts as an observable', () => {
+  describe('getPosts using spy creating service instantiation manually', () => {
+    beforeEach(() => {
+      http.get.and.returnValue(of(posts));
+    });
+    it('should return an observable from API', () => {
+      postsService.getPosts().subscribe({
+        next: (data: Posts[]) => {
+          expect(data).toEqual(posts);
+          expect(data.length).toBe(3);
+        },
+      });
+    });
+
+    it('should call the http get spy', () => {
+      postsService.getPosts();
+      expect(http.get).toHaveBeenCalled();
+    });
+  });
+
+  describe('getPosts using the TestBed injection of HttpClient with PostsService', () => {
+    beforeEach(() => {
+      http.get.and.returnValue(of(posts));
+    });
+
+    it('should behave...', () => {
+      service.getPosts();
+      expect(http.get).toHaveBeenCalled();
+      expect(http.get).toHaveBeenCalledWith(`${environment.urls.posts}`);
+    });
+
+    it('should return an instance of an observable', () => {
       expect(service.getPosts()).toBeInstanceOf(Observable);
     });
 
-    it('should have 3 elements returned', () => {
+    it('should return values', () => {
       service.getPosts().subscribe({
         next: (data: Posts[]) => {
           expect(data.length).toBe(3);
         },
       });
     });
-
-    it('should throw an error', () => {
-      service.getPosts = () => {
-        throw new Error('error');
-      };
-      expect(service.getPosts).toThrowError();
-    });
   });
 
   describe('deletePost', () => {
-    it('should remove the element with the corresponding ID', () => {
+    beforeEach(() => {
+      http.get.and.returnValue(of(posts.filter((post) => post.id !== id)));
+      http.delete.and.callThrough();
+    });
+
+    it('should expect http delete to have been called', () => {
       service.deletePost(1);
+      expect(http.delete).toHaveBeenCalled();
+      expect(http.delete).toHaveBeenCalledWith(
+        `${environment.urls.posts}${id}`
+      );
+    });
+
+    it('should expect the post to be removed', () => {
+      service.deletePost(id);
       service.getPosts().subscribe({
         next: (data: Posts[]) => {
           expect(data.length).toBe(2);
@@ -106,18 +128,14 @@ describe('PostsService', () => {
       });
     });
 
-    it('should not delete any elements if the ID is not a number greater than 0', () => {
+    it('should expect the post to not be removed', () => {
       service.deletePost(0);
-      expect(posts.length).toBe(3);
-      service.deletePost(-1);
-      expect(posts.length).toBe(3);
-    });
-
-    it('should throw an error', () => {
-      service.deletePost = (id: number) => {
-        throw new Error('error');
-      };
-      expect(service.deletePost).toThrowError();
+      http.get.and.returnValue(of(posts.filter((post) => post.id !== 0)));
+      service.getPosts().subscribe({
+        next: (data: Posts[]) => {
+          expect(data.length).toBe(3);
+        },
+      });
     });
   });
 });

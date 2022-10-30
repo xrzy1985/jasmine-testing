@@ -7,7 +7,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class PostsService {
+export class WithHttpClientTestingModuleService {
 
   constructor(private http: HttpClient) {}
 
@@ -31,3 +31,4 @@ export class PostsService {
     this.http.delete(`${environment.urls.posts}${id}`);
   }
 }
+
