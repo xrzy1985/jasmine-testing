@@ -2,16 +2,24 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { PipeModule } from './pipes/pipes.module';
+import { MainComponent } from './components/main/main.component';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientModule } from '@angular/common/http';
+import { UsersComponent } from './components/users/users.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
+        HttpClientModule,
+        HttpClientTestingModule,
         PipeModule,
         RouterTestingModule
       ],
       declarations: [
-        AppComponent
+        AppComponent,
+        MainComponent,
+        UsersComponent
       ]
     }).compileComponents();
   });
